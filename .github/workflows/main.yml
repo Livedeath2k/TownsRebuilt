@@ -11,10 +11,23 @@ on:
 
 jobs:
   build:
-    name: Compile and Test
-    runs-on: ubuntu-latest
+    name: Compile and Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            natives: natives-windows
+            zip_name: Towns-Windows.zip
+          - os: ubuntu-latest
+            natives: natives-linux
+            zip_name: Towns-Linux.zip
+          - os: macos-latest
+            natives: natives-macos-arm64
+            zip_name: Towns-MacOS.zip
 
     steps:
       - name: Checkout Repository
@@ -27,13 +40,14 @@ jobs:
           java-version: '26'
           cache: 'maven'
 
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Build with Maven (App Image)
+        run: mvn -B package -Pdist -Dlwjgl.natives=${{ matrix.natives }} --file pom.xml
 
       - name: Package compiled files
+        shell: bash
         run: |
-          cd target/dist/input
-          zip -r ../../../Towns-Release.zip .
+          cd target/dist
+          zip -r ../../${{ matrix.zip_name }} Towns*
 
       - name: Publish Pre-Release (Main)
         uses: softprops/action-gh-release@v2
@@ -41,12 +55,12 @@ jobs:
         with:
           tag_name: latest
           name: Latest Development Build
-          files: Towns-Release.zip
+          files: ${{ matrix.zip_name }}
           prerelease: true
 
       - name: Publish Release (Tags)
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: Towns-Release.zip
+          files: ${{ matrix.zip_name }}
           generate_release_notes: true
