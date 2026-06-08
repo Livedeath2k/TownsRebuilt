@@ -48,7 +48,11 @@ jobs:
         shell: bash
         run: |
           cd target/dist
-          zip -r ../../${{ matrix.zip_name }} Towns*
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            7z a ../../${{ matrix.zip_name }} Towns*
+          else
+            zip -r ../../${{ matrix.zip_name }} Towns*
+          fi
 
       - name: Publish Pre-Release (Main)
         uses: softprops/action-gh-release@v2
