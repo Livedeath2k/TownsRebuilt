@@ -41,6 +41,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven (App Image)
+        shell: bash
         run: mvn -B package -Pdist -Dlwjgl.natives=${{ matrix.natives }} --file pom.xml
 
       - name: Package compiled files
