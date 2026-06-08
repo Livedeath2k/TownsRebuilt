@@ -191,6 +191,7 @@
                                     <mainJar>towns.jar</mainJar>
                                     <mainClass>xaos.Towns</mainClass>
                                     <destination>${project.build.directory}/dist</destination>
+                                    <winConsole>true</winConsole>
                                     <javaOptions>
                                         <option>-XX:+UseZGC</option>
                                         <option>-XX:+ZGenerational</option>
